@@ -52,16 +52,21 @@ async def download_recording(
     current_user: User = Depends(get_current_active_user)
 ):
     """Download a recording"""
+    # Security: Use basename to prevent path traversal
+    filename = os.path.basename(filename)
     filepath = os.path.join(settings.RECORDINGS_PATH, filename)
     
-    if not os.path.exists(filepath):
+    # Verify the file exists and is within the recordings directory
+    recordings_path = os.path.abspath(settings.RECORDINGS_PATH)
+    file_path = os.path.abspath(filepath)
+    
+    if not file_path.startswith(recordings_path):
+        raise HTTPException(status_code=400, detail="Invalid file path")
+    
+    if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="Recording not found")
     
-    # Security: prevent path traversal
-    if '..' in filename or '/' in filename:
-        raise HTTPException(status_code=400, detail="Invalid filename")
-    
-    return FileResponse(filepath, filename=filename)
+    return FileResponse(file_path, filename=filename)
 
 
 @router.delete("/delete/{filename}")
@@ -70,17 +75,22 @@ async def delete_recording(
     current_user: User = Depends(get_current_active_user)
 ):
     """Delete a recording"""
+    # Security: Use basename to prevent path traversal
+    filename = os.path.basename(filename)
     filepath = os.path.join(settings.RECORDINGS_PATH, filename)
     
-    if not os.path.exists(filepath):
+    # Verify the file exists and is within the recordings directory
+    recordings_path = os.path.abspath(settings.RECORDINGS_PATH)
+    file_path = os.path.abspath(filepath)
+    
+    if not file_path.startswith(recordings_path):
+        raise HTTPException(status_code=400, detail="Invalid file path")
+    
+    if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="Recording not found")
     
-    # Security: prevent path traversal
-    if '..' in filename or '/' in filename:
-        raise HTTPException(status_code=400, detail="Invalid filename")
-    
     try:
-        os.remove(filepath)
+        os.remove(file_path)
         return {"message": "Recording deleted successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error deleting recording: {str(e)}")

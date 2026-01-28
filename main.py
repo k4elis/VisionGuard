@@ -23,9 +23,13 @@ app = FastAPI(
 )
 
 # CORS configuration
+origins = os.getenv("ALLOWED_ORIGINS", "*").split(",")
+if "*" in origins:
+    print("WARNING: CORS is configured to allow all origins. This should be changed in production!")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, replace with specific origins
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
