@@ -99,7 +99,7 @@ const LoginPage = () => {
           </form>
 
           <div className="mt-6 text-center text-sm text-slate-400">
-            <p>Default credentials: admin / change_me_in_production</p>
+            <p>Default credentials: admin / admin123</p>
           </div>
         </div>
       </div>

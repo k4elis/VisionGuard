@@ -67,7 +67,7 @@ Open your browser and go to:
 
 Use your configured credentials:
 - Username: `admin` (or what you set in .env)
-- Password: `change_me_in_production` (or what you set in .env)
+- Password: `admin123` (or what you set in .env)
 
 ## Step 6: Configure Your Cameras
 

@@ -20,12 +20,30 @@ security = HTTPBearer()
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a password against a hash"""
+    # Bcrypt has a 72-byte limit, truncate if necessary
+    if len(plain_password.encode('utf-8')) > 72:
+        plain_password = plain_password[:72]
     return pwd_context.verify(plain_password, hashed_password)
 
 
 def get_password_hash(password: str) -> str:
     """Hash a password"""
+    # Bcrypt has a 72-byte limit, truncate if necessary
+    if len(password.encode('utf-8')) > 72:
+        password = password[:72]
     return pwd_context.hash(password)
+
+
+# Pre-hash admin password on module load
+_admin_password_hash = None
+
+
+def _get_admin_password_hash():
+    """Get cached admin password hash"""
+    global _admin_password_hash
+    if _admin_password_hash is None:
+        _admin_password_hash = get_password_hash(settings.ADMIN_PASSWORD)
+    return _admin_password_hash
 
 
 def get_user(username: str) -> Optional[UserInDB]:
@@ -33,7 +51,7 @@ def get_user(username: str) -> Optional[UserInDB]:
     if username == settings.ADMIN_USERNAME:
         return UserInDB(
             username=settings.ADMIN_USERNAME,
-            hashed_password=get_password_hash(settings.ADMIN_PASSWORD),
+            hashed_password=_get_admin_password_hash(),
             disabled=False
         )
     return None

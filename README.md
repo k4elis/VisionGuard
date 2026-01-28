@@ -143,7 +143,7 @@ npm run dev
 
 ### Login
 1. Navigate to http://localhost
-2. Login with your admin credentials (default: admin / change_me_in_production)
+2. Login with your admin credentials (default: admin / admin123)
 
 ### Dashboard
 - **Live Cameras Tab**: View real-time streams from both cameras
