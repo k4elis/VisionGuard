@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: visionguard-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./recordings:/app/recordings
+      - ./.env:/app/.env
+    environment:
+      - DEBUG=false
+    restart: unless-stopped
+    networks:
+      - visionguard-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: visionguard-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - visionguard-network
+
+networks:
+  visionguard-network:
+    driver: bridge
+
+volumes:
+  recordings:
