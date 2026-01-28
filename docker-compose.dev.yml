@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  backend-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: visionguard-backend-dev
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app/backend
+      - ./main.py:/app/main.py
+      - ./recordings:/app/recordings
+      - ./.env:/app/.env
+    environment:
+      - DEBUG=true
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    restart: unless-stopped
+    networks:
+      - visionguard-network
+
+  frontend-dev:
+    image: node:18-alpine
+    container_name: visionguard-frontend-dev
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    restart: unless-stopped
+    networks:
+      - visionguard-network
+
+networks:
+  visionguard-network:
+    driver: bridge
